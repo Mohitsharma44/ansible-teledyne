@@ -1,2 +1,22 @@
 ---
 # defaults file for teledyne
+
+# Dependencies for teledyne sdk
+teledyne_deps:
+  - g++
+  - libgtk-3-dev
+  - make
+  - libglade2-0
+  - libglade2-dev
+  - libx11-dev
+  - libxext-dev
+
+# If you provide a custom sdk url, make sure to provide sha256 checksum
+teledyne_sdk_url: ""
+teledyne_sdk_sha256:
+
+# Path where you want to download all the SDK files
+teledyne_build_dir: ""
+
+# Path where you want to keep SDK related installation files
+teledyne_install_loc: ""
