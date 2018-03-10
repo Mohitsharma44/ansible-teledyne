@@ -1,0 +1,29 @@
+- name: Patching the installer script
+  block:
+  - name: Commenting out license accept script (part 1)
+    lineinfile:
+      dest: "{{ teledyne_install_loc }}/current_version/DALSA/GigeV/bin/install.gigev"
+      regexp: '# Display the license information and get acceptance/rejection.'
+      insertbefore: '^# Display the license information and get acceptance/rejection.'
+      line: ": ' # Display the license information and get acceptance/rejection."
+      backup: yes
+
+  - name: Commenting out license accept script (part 2)
+    lineinfile:
+      dest: "{{ teledyne_install_loc }}/current_version/DALSA/GigeV/bin/install.gigev"
+      regexp: '# Here we will need the sudo password set up to copy to installation dir.'
+      insertbefore: '^# Here we will need the sudo password set up to copy to installation dir.'
+      line: "' # Here we will need the sudo password set up to copy to installation dir."
+      backup: yes
+
+- name: Running installer
+  block:
+  - name: Installing SDK
+    shell: "{{ teledyne_install_loc }}/current_version/DALSA/corinstall >> {{ teledyne_install_loc }}/current_version/DALSA/install.log"
+    args:
+      executable: /bin/bash
+
+  - name: Making sure installation was successful
+    shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/install.log"
+    register: failed_in_logs
+    notify: rollback
