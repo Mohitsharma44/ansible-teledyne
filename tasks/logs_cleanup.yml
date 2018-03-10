@@ -1,0 +1,14 @@
+- name: Deleting previous installer logs
+  block:
+  - name: Finding log files
+    find:
+      paths: /home/mohitsharma44/DALSA/
+      patterns: "*.log"
+    register: log_files
+
+- name: Deleting log files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items:
+    - "{{ log_files.files }}"
