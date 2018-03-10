@@ -2,7 +2,7 @@
   block:
   - name: Finding log files
     find:
-      paths: /home/mohitsharma44/DALSA/
+      paths: "{{ teledyne_install_loc }}/current_version/DALSA/"
       patterns: "*.log"
     register: log_files
 
