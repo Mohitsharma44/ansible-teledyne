@@ -27,3 +27,11 @@
     shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/install.log"
     register: failed_in_logs
     notify: rollback
+
+- name: Adding environment variables
+  blockinfile:
+    block: "{{ lookup('file', './env.txt') }}"
+    dest: "/home/mohitsharma44/.bashrc"
+    marker: "# --- {mark} ANSIBLE MANAGED BLOCK --- #"
+    insertafter: EOF
+    backup: yes
