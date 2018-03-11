@@ -12,3 +12,4 @@
     state: absent
   with_items:
     - "{{ log_files.files }}"
+  become: yes
