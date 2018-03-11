@@ -1,0 +1,59 @@
+---
+# tasks file for teledyne
+
+- name: Install Dependencies
+  apt:
+    name: "{{ item }}"
+    update_cache: yes
+    cache_valid_time: 3600
+    state: present
+  with_items:
+    - "{{ teledyne_deps }}"
+  become: yes
+
+- name: Downloading Teledyne SDK
+  get_url:
+    url: '{{ teledyne_sdk_url | default(teledyne_sdk_url) }}'
+    dest: '{{ teledyne_build_dir }}'
+    checksum: '{{ teledyne_sdk_sha256 | default(teledyne_sdk_sha256) }}'
+    mode: 0644
+  become: yes
+
+- set_fact:
+    file_name: "{{ teledyne_sdk_url | default(teledyne_sdk_url) }}"
+
+- name: Unarchiving Teledyne SDK
+  unarchive:
+    remote_src: yes
+    src: "{{ teledyne_build_dir }}/{{ file_name.split('/')[-1] }}"
+    dest: '{{ teledyne_install_loc }}'
+    #creates: '{{ teledyne_install_loc }}/teledyne-SDKs'
+  become: yes
+
+- set_fact:
+    # Setup only for x86 architectures
+    arch: "{{ 'x86' if ((ansible_architecture == 'x86_64') and (ansible_os_family == 'Debian')) else 'None' }}"
+
+- find:
+    paths: '{{ teledyne_install_loc }}'
+    patterns: "GigE-V-Framework_{{ arch }}*.tar.gz"
+    recurse: yes
+  register: sdk_filename
+  failed_when: sdk_filename is not defined
+
+- debug:
+    msg: "sdk_filename: {{ sdk_filename }}"
+
+- name: Ensure sdk install location exists
+  file:
+    path: '{{ teledyne_install_loc }}/current_version'
+    state: directory
+
+- name: Unarchiving SDK based on the current system architecture
+  unarchive:
+    remote_src: yes
+    src: "{{ sdk_filename.files[0].path }}"
+    dest: "{{ teledyne_install_loc }}/current_version"
+    #creates: '{{ teledyne_install_loc }}/current_version/DALSA'
+  when: sdk_filename is defined
+  become: yes
