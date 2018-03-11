@@ -6,7 +6,7 @@
       regexp: '# Display the license information and get acceptance/rejection.'
       insertbefore: '^# Display the license information and get acceptance/rejection.'
       line: ": ' # Display the license information and get acceptance/rejection."
-      backup: yes
+      backup: no
 
   - name: Commenting out license accept script (part 2)
     lineinfile:
@@ -14,24 +14,24 @@
       regexp: '# Here we will need the sudo password set up to copy to installation dir.'
       insertbefore: '^# Here we will need the sudo password set up to copy to installation dir.'
       line: "' # Here we will need the sudo password set up to copy to installation dir."
-      backup: yes
+      backup: no
 
 - name: Running installer
   block:
   - name: Installing SDK
-    shell: "{{ teledyne_install_loc }}/current_version/DALSA/corinstall >> {{ teledyne_install_loc }}/current_version/DALSA/install.log"
+    shell: "{{ teledyne_install_loc }}/current_version/DALSA/corinstall >> {{ teledyne_install_loc }}/current_version/DALSA/setup.log"
     args:
       executable: /bin/bash
 
   - name: Making sure installation was successful
-    shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/install.log"
+    shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
     register: failed_in_logs
     notify: rollback
 
 - name: Adding environment variables
   blockinfile:
-    block: "{{ lookup('file', './env.txt') }}"
+    block: "{{ lookup('file', role_path + '/defaults/env.txt') }}"
     dest: "/home/mohitsharma44/.bashrc"
     marker: "# --- {mark} ANSIBLE MANAGED BLOCK --- #"
     insertafter: EOF
-    backup: yes
+    backup: no
