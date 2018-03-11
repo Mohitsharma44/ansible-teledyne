@@ -1,45 +1,7 @@
 ---
-# tasks file for teledyne
 
-- name: Install Dependencies
-  apt:
-    name: "{{ item }}"
-    update_cache: yes
-    cache_valid_time: 3600
-    state: present
-  with_items:
-    - "{{ teledyne_deps }}"
-  become: yes
+- include_tasks: "logs_cleanup.yml"
 
-- name: Downloading Teledyne SDK
-  get_url:
-    url: '{{ teledyne_sdk_url | default(teledyne_sdk_url) }}'
-    dest: '{{ teledyne_build_dir }}'
-    checksum: '{{ teledyne_sdk_sha256 | default(teledyne_sdk_sha256) }}'
-    mode: 0644
-  become: yes
+- include_tasks: "pre-install.yml"
 
-- name: Unarchiving Teledyne SDK
-  unarchive:
-    remote_src: yes
-    src: '{{ teledyne_build_dir }}'
-    dest: '{{ teledyne_install_loc }}'
-    creates: '{{ teledyne_install_loc }}/teledyne-SDKs'
-  become: yes
-
-- set_fact:
-    # Setup only for x86 architectures
-    arch: "{{ 'x86' if ((ansible_architecture == 'x86_64') and (ansible_os_family == 'Debian')) else 'None' }}"
-
-- find:
-    paths: '{{ teledyne_install_loc }}/teledyne-SDKs/ }}'
-    patterns: "GigE-V-Framework_{{ arch }}*.tar.gz"
-  register: sdk_filename
-
-- name: Unarchiving SDK based on the current system architecture
-  unarchive:
-    remote_src: yes
-    src: sdk_filename
-    dest: '{{ teledyne_install_loc }}'
-    creates: '{{ teledyne_install_loc }}/current_version'
-  become: yes
+- include_tasks: "sdk_installer.yml"
