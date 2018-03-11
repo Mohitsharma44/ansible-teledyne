@@ -1,2 +1,12 @@
 ---
-# handlers file for teledyne
+
+- name: rollback
+  shell: "{{ teledyne_install_loc }}/current_version/DALSA/corinstall uninstall >> {{ teledyne_install_loc }}/current_version/DALSA/uninstall.log"
+  args:
+    executable: /bin/bash
+  when: failed_in_logs.stdout.find('failed') != -1
+  notify: error log
+
+- name: error log
+  fail:
+    msg: "Installation of SDK failed. Check the logs: {{ teledyne_install_loc }}/current_version/DALSA/install.log"
