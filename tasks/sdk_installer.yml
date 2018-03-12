@@ -6,6 +6,7 @@
       regexp: '# Display the license information and get acceptance/rejection.'
       insertbefore: '^# Display the license information and get acceptance/rejection.'
       line: ": ' # Display the license information and get acceptance/rejection."
+      state: present
       backup: no
 
   - name: Commenting out license accept script (part 2)
@@ -14,6 +15,7 @@
       regexp: '# Here we will need the sudo password set up to copy to installation dir.'
       insertbefore: '^# Here we will need the sudo password set up to copy to installation dir.'
       line: "' # Here we will need the sudo password set up to copy to installation dir."
+      state: present
       backup: no
 
 - name: Running installer
@@ -22,22 +24,24 @@
     - name: Finding all installer files
       find:
         paths: "{{ teledyne_install_loc }}/current_version/DALSA/"
-	patterns: "install.gigev"
-	recurse: yes
+        patterns: "install.gigev"
+        recurse: yes
       register: installer_file
 
     - name: Installing SDK
       shell: "{{ installer_file.files[0].path }} >> {{ teledyne_install_loc }}/current_version/DALSA/setup.log"
       args:
         chdir: "{{ installer_file.files[0].path | dirname }}"
-	executable: bash
-	creates: "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
+        executable: bash
+        creates: "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
       register: install_log
+      changed_when: install_log.stdout != ""
 
-  - name: Making sure installation was successful
-    shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
-    register: failed_in_logs
-    notify: rollback
+    - name: Making sure installation was successful
+      shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
+      register: failed_in_logs
+      changed_when: failed_in_logs.stdout.find('failed') != -1
+      notify: rollback
 
 - name: Adding environment variables
   blockinfile:
