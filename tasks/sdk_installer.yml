@@ -18,10 +18,21 @@
 
 - name: Running installer
   block:
-  - name: Installing SDK
-    shell: "{{ teledyne_install_loc }}/current_version/DALSA/corinstall >> {{ teledyne_install_loc }}/current_version/DALSA/setup.log"
-    args:
-      executable: /bin/bash
+
+    - name: Finding all installer files
+      find:
+        paths: "{{ teledyne_install_loc }}/current_version/DALSA/"
+	patterns: "install.gigev"
+	recurse: yes
+      register: installer_file
+
+    - name: Installing SDK
+      shell: "{{ installer_file.files[0].path }} >> {{ teledyne_install_loc }}/current_version/DALSA/setup.log"
+      args:
+        chdir: "{{ installer_file.files[0].path | dirname }}"
+	executable: bash
+	creates: "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
+      register: install_log
 
   - name: Making sure installation was successful
     shell: cat "{{ teledyne_install_loc }}/current_version/DALSA/setup.log"
