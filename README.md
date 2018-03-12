@@ -1,38 +1,65 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Ansible role for installing Teledyne Dalsa SDK (tested with v2.02.0.0132)
+> Although this role has been tested with v2.02.0.0132 their installer scripts have not changed
+> so this is definitely backwards compatible and hopefully even with their new sdk version releases
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+NA
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+```yaml
+
+# Dependencies for teledyne sdk
+teledyne_deps:
+  - g++
+  - libgtk-3-dev
+  - make
+  - libglade2-0
+  - libglade2-dev
+  - libx11-dev
+  - libxext-dev
+
+# If you provide a custom sdk url, make sure to provide sha256 checksum
+teledyne_sdk_url: http://localhost:8000/gige-v-framework_20200132.tar.gz
+teledyne_sdk_sha256: sha256:a7d25f0616e333e68005cf54ef425252b6ac80388d2d283bafd9864dd3fe3aaa
+
+# Path where you want to download all the SDK files
+teledyne_build_dir: "/home/mohitsharma44/teledyne_build"
+
+# Path where you want to keep SDK related installation files
+teledyne_install_loc: "/home/mohitsharma44/teledyne_install"
+
+```
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+NA
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+---
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+- hosts: localhost
+  tasks:
+  roles:
+    - { role: mohitsharma44.ansible-teledyne }
+```
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Mohit Sharma (Mohitsharma44@gmail.com)
