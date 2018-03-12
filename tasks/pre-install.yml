@@ -27,7 +27,9 @@
     remote_src: yes
     src: "{{ teledyne_build_dir }}/{{ file_name.split('/')[-1] }}"
     dest: '{{ teledyne_install_loc }}'
-    #creates: '{{ teledyne_install_loc }}/teledyne-SDKs'
+    extra_opts: [--strip-components=1]
+    # we know that the name of their manual name doesn't change 
+    creates: '{{ teledyne_install_loc }}/GigE-V_Framework_Programmers_Manual.pdf'
   become: yes
 
 - set_fact:
@@ -41,9 +43,6 @@
   register: sdk_filename
   failed_when: sdk_filename is not defined
 
-- debug:
-    msg: "sdk_filename: {{ sdk_filename }}"
-
 - name: Ensure sdk install location exists
   file:
     path: '{{ teledyne_install_loc }}/current_version'
@@ -54,6 +53,6 @@
     remote_src: yes
     src: "{{ sdk_filename.files[0].path }}"
     dest: "{{ teledyne_install_loc }}/current_version"
-    #creates: '{{ teledyne_install_loc }}/current_version/DALSA'
+    creates: '{{ teledyne_install_loc }}/current_version/DALSA/corinstall'
   when: sdk_filename is defined
   become: yes
